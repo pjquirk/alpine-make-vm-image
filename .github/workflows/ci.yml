@@ -17,9 +17,9 @@ jobs:
       - name: Build image
         run: |
           sudo ./alpine-make-vm-image \
-              --image-format qcow2 \
+              --image-format vhd \
               --image-size 2G \
               --repositories-file example/repositories \
               --packages "$(cat example/packages)" \
               --script-chroot \
-              alpine-virthardened-$(date +%Y-%m-%d).qcow2 -- ./example/configure.sh
+              alpine-virthardened-$(date +%Y-%m-%d).vhd -- ./example/configure.sh
