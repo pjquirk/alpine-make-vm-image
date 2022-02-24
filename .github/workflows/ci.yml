@@ -23,3 +23,13 @@ jobs:
               --packages "$(cat example/packages)" \
               --script-chroot \
               alpine-virthardened-$(date +%Y-%m-%d).vhd -- ./example/configure.sh
+      
+      - name: Upload Image
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          # Artifact name
+          name: 'VHD'
+          # A file, directory or wildcard pattern that describes what to upload
+          path: '*.vhd'
+          # The desired behavior if no files are found using the provided path.
+
