@@ -323,6 +323,7 @@ while [ $# -gt 0 ]; do
 	case "$1" in
 		-b | --branch) ALPINE_BRANCH="$2";;
 		-f | --image-format) IMAGE_FORMAT="$2";;
+		-z | --image-subformat) IMAGE_SUBFORMAT="$2"";;
 		-s | --image-size) IMAGE_SIZE="$2";;
 		-i | --initfs-features) INITFS_FEATURES="${INITFS_FEATURES:-} $2";;
 		-k | --kernel-flavor) KERNEL_FLAVOR="$2";;
@@ -345,6 +346,7 @@ done
 : ${ALPINE_MIRROR:="http://dl-cdn.alpinelinux.org/alpine"}
 : ${CLEANUP:="yes"}
 : ${IMAGE_FORMAT:=}
+: ${IMAGE_SUBFORMAT:=}
 : ${IMAGE_SIZE:="2G"}
 : ${INITFS_FEATURES:="scsi virtio"}
 : ${KERNEL_FLAVOR:="virt"}
@@ -402,7 +404,7 @@ fi
 #-----------------------------------------------------------------------
 if [ ! -f "$IMAGE_FILE" ]; then
 	einfo "Creating $IMAGE_FORMAT image of size $IMAGE_SIZE"
-	qemu-img create ${IMAGE_FORMAT:+-f $IMAGE_FORMAT} "$IMAGE_FILE" "$IMAGE_SIZE"
+	qemu-img create ${IMAGE_FORMAT:+-f $IMAGE_FORMAT} ${IMAGE_SUBFORMAT:+-o subformat=$IMAGE_SUBFORMAT} "$IMAGE_FILE" "$IMAGE_SIZE"
 fi
 
 #-----------------------------------------------------------------------
