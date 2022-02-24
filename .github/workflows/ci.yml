@@ -19,7 +19,7 @@ jobs:
           sudo ./alpine-make-vm-image \
               --image-format vpc \
               --image-subformat fixed \
-              --image-size 2G \
+              --image-size 512M \
               --repositories-file example/repositories \
               --packages "$(cat example/packages)" \
               --script-chroot \
