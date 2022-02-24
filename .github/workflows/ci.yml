@@ -17,7 +17,8 @@ jobs:
       - name: Build image
         run: |
           sudo ./alpine-make-vm-image \
-              --image-format "vpc -o subformat=fixed" \
+              --image-format vpc \
+              --image-subformat fixed \
               --image-size 2G \
               --repositories-file example/repositories \
               --packages "$(cat example/packages)" \
