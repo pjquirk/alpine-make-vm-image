@@ -28,7 +28,7 @@ jobs:
               --repositories-file example/repositories \
               --packages "$(cat example/packages)" \
               --script-chroot \
-              $fileName -- ./example/configure.sh
+              $vhdDisk -- ./example/configure.sh
           
           # Resize VHD to make it compatable with Azure    
           # https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-upload-generic#resizing-vhds    
