@@ -48,4 +48,4 @@ waagent -help
 waagent -version
 
 step 'Generalize'
-waagent -deprovision -force
+sudo waagent -deprovision+user -force
