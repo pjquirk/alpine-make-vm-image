@@ -17,6 +17,7 @@ jobs:
 
       - name: Build image
         run: |
+          set -x
           baseFileName="alpine-virthardened-$(date +%Y-%m-%d)"
           vhdDisk="$baseFileName.vhd"
           rawDisk="$baseFileName.raw"
@@ -32,7 +33,7 @@ jobs:
           # Resize VHD to make it compatable with Azure    
           # https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-upload-generic#resizing-vhds    
           # Convert to RAW disk    
-          qemu-img convert -f vpc -O raw MyLinuxVM.vhd MyLinuxVM.raw
+          qemu-img convert -f vpc -O raw $vhdDisk $rawDisk
           
           # Calculate the required size of the disk image so that the virtual size is aligned to 1 MB. 
           MB=$((1024*1024))
