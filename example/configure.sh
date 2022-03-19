@@ -6,7 +6,6 @@ step() {
 	printf '\n\033[1;36m%d) %s\033[0m\n' $_step_counter "$@" >&2  # bold cyan
 }
 
-
 step 'Set up timezone'
 setup-timezone -z Europe/Prague
 
@@ -32,3 +31,21 @@ rc-update add crond default
 rc-update add net.eth0 default
 rc-update add net.lo boot
 rc-update add termencoding boot
+
+step 'Download WALinuxAgent'
+wget https://github.com/Azure/WALinuxAgent/archive/v2.7.0.6.zip
+unzip v2.7.0.6.zip
+cd WALinuxAgent-2.7.0.6
+
+step 'Install WALinuxAgent'
+apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
+python3 -m ensurepip
+pip3 install --no-cache --upgrade pip setuptools
+pip install distro
+python setup.py install
+sed -i 's/# AutoUpdate.Enabled=n/AutoUpdate.Enabled=y/g' /etc/waagent.conf
+waagent -help
+waagent -version
+
+step 'Generalize'
+waagent -deprovision -force
