@@ -42,7 +42,7 @@ jobs:
           echo "Rounded Size = $rounded_size"
           
           # Resize the raw disk
-          qemu-img resize $rawDisk $rounded_size
+          qemu-img resize -f raw $rawDisk $rounded_size
           
           # Convert the RAW disk back to a fixed-size VHD
           sudo qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $rawDisk $vhdDisk
