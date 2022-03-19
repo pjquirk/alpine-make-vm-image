@@ -71,39 +71,3 @@ EOF
 
 chmod +x /etc/init.d/waagent
 rc-update add waagent default
-
-# Workaround for default password
-# Basically, useradd on Alpine locks the account by default if no password
-# was given, and the user can't login, even via ssh public keys. The useradd.sh script
-# changes the default password to a non-valid but non-locking string.
-# The useradd.sh script is installed in /usr/local/sbin, which takes precedence
-# by default over /usr/sbin where the real useradd command lives.
-mkdir -p /usr/local/sbin
-
-cat > /usr/local/sbin/useradd <<EOF
-#!/bin/sh
-
-/usr/sbin/useradd $*
-
-# if success...
-if [ $? == 0 ]; then
-        # was the passwd set in the command?
-        passwd_set=
-        for i in "$@"; do
-                if [ $i == "-p" -o $i == "--password" ]; then
-                        passwd_set=0
-                fi
-        done
-        # if the passwd was set, don't mess with it
-        # if no passwd was set, replace the default "!" with "*"
-        # (still invalid password, but the account is not locked for ssh)
-        if [ $passwd_set ]; then
-                echo "useradd: password was set, doing nothing"
-        else
-                echo "useradd: force default password"
-                for login; do true; done
-                usermod -p "*" $login
-        fi
-fi
-EOF
-chmod +x /usr/local/sbin/useradd
