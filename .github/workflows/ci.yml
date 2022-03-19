@@ -45,7 +45,7 @@ jobs:
           qemu-img resize $rawDisk $rounded_size
           
           # Convert the RAW disk back to a fixed-size VHD
-          qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $rawDisk $vhdDisk
+          sudo qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $rawDisk $vhdDisk
       
       - name: Upload Image
         uses: actions/upload-artifact@v2.3.1
