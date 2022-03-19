@@ -17,7 +17,7 @@ jobs:
 
       - name: Build image
         run: |
-          baseFileName="alpine-virthardened-$($now +%Y-%m-%d)"
+          baseFileName="alpine-virthardened-$(date +%Y-%m-%d)"
           vhdDisk="$baseFileName.vhd"
           rawDisk="$baseFileName.raw"
           sudo ./alpine-make-vm-image \
