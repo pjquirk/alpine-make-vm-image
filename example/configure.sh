@@ -1,4 +1,5 @@
 #!/bin/sh
+set -ex
 
 _step_counter=0
 step() {
@@ -33,11 +34,15 @@ rc-update add net.lo boot
 rc-update add termencoding boot
 
 step 'Download WALinuxAgent'
+rm -f v2.7.0.6.zip
 wget https://github.com/Azure/WALinuxAgent/archive/v2.7.0.6.zip
-unzip v2.7.0.6.zip
+unzip -o v2.7.0.6.zip
 cd WALinuxAgent-2.7.0.6
 
 step 'Install WALinuxAgent'
+# Community package required for shadow
+echo "http://dl-cdn.alpinelinux.org/alpine/v3.6/community" >> /etc/apk/repositories
+
 apk add openssl sudo bash shadow parted iptables sfdisk
 apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 python3 -m ensurepip
@@ -48,17 +53,16 @@ sed -i 's/# AutoUpdate.Enabled=n/AutoUpdate.Enabled=y/g' /etc/waagent.conf
 waagent -help
 waagent -version
 
-step 'Generalize'
-sudo waagent -deprovision+user -force
-
-# Update boot params
+step 'Update boot params'
 sed -i 's/^default_kernel_opts="[^"]*/\0 console=ttyS0 earlyprintk=ttyS0 rootdelay=300/' /etc/update-extlinux.conf
 update-extlinux
 
 # sshd configuration
+step 'sshd configuration'
 sed -i 's/^#ClientAliveInterval 0/ClientAliveInterval 180/' /etc/ssh/sshd_config
 
 # Start waagent at boot
+step 'Configure waagent to start at boot'
 cat > /etc/init.d/waagent <<EOF
 #!/sbin/openrc-run                                                                 
 export PATH=/usr/local/sbin:$PATH
@@ -71,3 +75,6 @@ EOF
 
 chmod +x /etc/init.d/waagent
 rc-update add waagent default
+
+step 'Generalize'
+sudo waagent -deprovision+user -force
