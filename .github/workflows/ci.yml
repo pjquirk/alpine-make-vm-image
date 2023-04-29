@@ -13,46 +13,46 @@ jobs:
           sudo apt-get update
           sudo apt-get install qemu-utils
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build image
         run: |
           set -x
-          baseFileName="alpine-virthardened-$(date +%Y-%m-%d)"
-          vhdDisk="$baseFileName.vhd"
+          baseFileName="alpine-$(date +%Y-%m-%d)"
+          qcow2Disk="$baseFileName.qcow2"
           rawDisk="$baseFileName.raw"
           sudo ./alpine-make-vm-image \
-              --image-format vpc \
-              --image-subformat fixed \
-              --image-size 512M \
+              --image-format qcow2 \
+              --image-size 2G \
               --repositories-file example/repositories \
               --packages "$(cat example/packages)" \
+              --fs-skel-dir example/rootfs \
+              --fs-skel-chown root:root \
               --script-chroot \
-              $vhdDisk -- ./example/configure.sh
-          
-          # Resize VHD to make it compatable with Azure    
-          # https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-upload-generic#resizing-vhds    
-          # Convert to RAW disk    
-          qemu-img convert -f vpc -O raw $vhdDisk $rawDisk
-          
-          # Calculate the required size of the disk image so that the virtual size is aligned to 1 MB. 
-          MB=$((1024*1024))
-          size=$(qemu-img info -f raw --output json "$rawDisk" | gawk 'match($0, /"virtual-size": ([0-9]+),/, val) {print val[1]}')
-          rounded_size=$(((($size+$MB-1)/$MB)*$MB))
-          echo "Rounded Size = $rounded_size"
-          
+              "$qcow2Disk" -- ./example/configure.sh
+
+          # Resize VHD to make it compatable with Azure
+          # https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-upload-generic#resizing-vhds
+          # Convert to RAW disk
+          # qemu-img convert -f vpc -O raw $vhdDisk $rawDisk
+
+          # Calculate the required size of the disk image so that the virtual size is aligned to 1 MB.
+          # MB=$((1024*1024))
+          # size=$(qemu-img info -f raw --output json "$rawDisk" | gawk 'match($0, /"virtual-size": ([0-9]+),/, val) {print val[1]}')
+          # rounded_size=$(((($size+$MB-1)/$MB)*$MB))
+          # echo "Rounded Size = $rounded_size"
+
           # Resize the raw disk
-          qemu-img resize -f raw $rawDisk $rounded_size
-          
+          # qemu-img resize -f raw $rawDisk $rounded_size
+
           # Convert the RAW disk back to a fixed-size VHD
-          sudo qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $rawDisk $vhdDisk
-      
+          # sudo qemu-img convert -f raw -o subformat=fixed,force_size -O vpc $rawDisk $vhdDisk
+
       - name: Upload Image
         uses: actions/upload-artifact@v2.3.1
         with:
           # Artifact name
-          name: 'VHD'
+          name: 'QCOW2'
           # A file, directory or wildcard pattern that describes what to upload
-          path: '*.vhd'
+          path: '*.qcow2'
           # The desired behavior if no files are found using the provided path.
-
