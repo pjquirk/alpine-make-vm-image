@@ -1,8 +1,8 @@
 = Make Alpine Linux VM Image
 :script-name: alpine-make-vm-image
-:script-sha1: ddf44e4132a32e762cd0ae46e12c0122c5c18877
+:script-sha1: 88b64032dd8d6988f1262267a0a0de2e63a27ae4
 :gh-name: alpinelinux/{script-name}
-:version: 0.8.0
+:version: 0.11.0
 
 ifdef::env-github[]
 image:https://github.com/{gh-name}/workflows/CI/badge.svg["Build Status", link="https://github.com/{gh-name}/actions"]
@@ -11,16 +11,22 @@ endif::env-github[]
 This project provides a script for making customized https://alpinelinux.org/[Alpine Linux] disk images for virtual machines.
 It’s quite simple (300 LoC of shell), fast (~32 seconds on GitHub Actions) and requires minimum dependencies (QEMU and filesystem tools).
 
-TIP: Don’t need VM, just want to chroot into Alpine Linux (e.g. on CI)?
+TIP: Don’t need VM, just wanna chroot into Alpine Linux?
      Try https://github.com/alpinelinux/alpine-chroot-install[alpine-chroot-install]!
+     Or do you want to create a custom rootfs?
+     Then https://github.com/alpinelinux/alpine-make-rootfs[alpine-make-rootfs] is for you!
 
 
 == Requirements
 
 * Linux system with common userland (Busybox or GNU coreutils)
 * POSIX-sh compatible shell (e.g. Busybox ash, dash, Bash, ZSH)
-* qemu-img and qemu-nbd (automatically installed by the script if running on Alpine)
-* e2fsprogs (for ext4), btrfs-progs (for Btrfs), or xfsprogs (for XFS) (automatically installed by the script if running on Alpine)
+* qemu-img and qemu-nbd
+* rsync (needed only for `--fs-skel-dir`)
+* sfdisk (needed only for `--partition`)
+* e2fsprogs (for ext4), btrfs-progs (for Btrfs), or xfsprogs (for XFS)
+
+All dependencies except the first two are automatically installed by the script when running on Alpine.
 
 
 == Usage
@@ -34,6 +40,8 @@ You can copy link:{script-name}[{script-name}] into your repository or download 
 wget https://raw.githubusercontent.com/{gh-name}/v{version}/{script-name} \
     && echo '{script-sha1}  {script-name}' | sha1sum -c \
     || exit 1
+
+Or, if you are on Alpine Linux, you can simply install the https://pkgs.alpinelinux.org/packages?name={script-name}[{script-name}] package.
 
 
 == Pitfalls
